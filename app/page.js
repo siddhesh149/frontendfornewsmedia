@@ -1,17 +1,17 @@
-import { getArticles, getCategories } from "@/services/api";
+import { getArticles, getCategories, getTrendingArticles } from "@/services/api";
 import Header from "@/components/Header";
 import ArticleCard from "@/components/ArticleCard";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import { searchArticles } from "@/services/api";
 
 export default async function Home() {
-  const [articles, categories] = await Promise.all([
+  const [articles, categories, trendingArticles] = await Promise.all([
     getArticles(),
-    getCategories()
+    getCategories(),
+    getTrendingArticles()
   ]);
-
-  // Get trending articles (first 5)
-  const trendingArticles = articles.slice(0, 5);
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -20,18 +20,30 @@ export default async function Home() {
       {/* Search Bar */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="relative">
+          <form className="relative" onSubmit={async (e) => {
+            e.preventDefault();
+            const query = e.target.search.value;
+            if (query) {
+              const results = await searchArticles(query);
+              // Handle search results (you might want to show them in a modal or redirect to a search page)
+              console.log('Search results:', results);
+            }
+          }}>
             <input
               type="text"
+              name="search"
               placeholder="Search news..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
             />
-            <button className="absolute right-3 top-2 text-gray-400 hover:text-gray-600">
+            <button 
+              type="submit"
+              className="absolute right-3 top-2 text-gray-400 hover:text-gray-600"
+            >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </button>
-          </div>
+          </form>
         </div>
       </div>
 
@@ -82,7 +94,7 @@ export default async function Home() {
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Trending Now</h3>
               <div className="space-y-4">
-                {trendingArticles.map((article, index) => (
+                {trendingArticles.map((article) => (
                   <Link 
                     key={article.id} 
                     href={`/article/${article.slug}`}
@@ -113,10 +125,25 @@ export default async function Home() {
             <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-xl font-bold text-gray-900 mb-4">Subscribe to Our Newsletter</h3>
               <p className="text-gray-600 mb-4">Get the latest news delivered to your inbox.</p>
-              <form className="space-y-4">
+              <form 
+                className="space-y-4"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  const email = e.target.email.value;
+                  try {
+                    await subscribeNewsletter(email);
+                    alert('Successfully subscribed to newsletter!');
+                    e.target.reset();
+                  } catch (error) {
+                    alert('Failed to subscribe. Please try again.');
+                  }
+                }}
+              >
                 <input
                   type="email"
+                  name="email"
                   placeholder="Enter your email"
+                  required
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
                 />
                 <button
