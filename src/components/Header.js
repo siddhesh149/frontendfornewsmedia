@@ -2,18 +2,35 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function Header({ categories }) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-white shadow-md">
+    <header className="bg-white shadow-sm">
+      {/* Breaking News Banner */}
+      <div className="bg-red-600 text-white py-2">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <span className="font-bold">BREAKING:</span>
+              <div className="overflow-hidden">
+                <div className="animate-marquee whitespace-nowrap">
+                  Latest updates on global news and developments. Stay informed with our breaking news coverage.
+                </div>
+              </div>
+            </div>
+            <button className="text-sm hover:text-gray-200">More News</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center py-4">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0 flex items-center">
-            <span className="text-2xl font-bold text-red-600">NewsExpress</span>
+          <Link href="/" className="text-2xl font-bold text-red-600">
+            The Indian Express
           </Link>
 
           {/* Desktop Navigation */}
@@ -22,48 +39,61 @@ export default function Header({ categories }) {
               <Link
                 key={category.id}
                 href={`/category/${category.slug}`}
-                className="text-gray-700 hover:text-red-600 px-3 py-2 text-sm font-medium"
+                className="text-gray-600 hover:text-red-600 transition-colors"
               >
                 {category.name}
               </Link>
             ))}
           </nav>
 
-          {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              type="button"
-              className="text-gray-700 hover:text-red-600"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+          {/* Mobile Menu Button */}
+          <button
+            className="md:hidden text-gray-600"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              <span className="sr-only">Open menu</span>
-              {isMenuOpen ? (
-                <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+              {isMobileMenuOpen ? (
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               ) : (
-                <Bars3Icon className="h-6 w-6" aria-hidden="true" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 6h16M4 12h16M4 18h16"
+                />
               )}
-            </button>
-          </div>
+            </svg>
+          </button>
         </div>
-      </div>
 
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1">
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/category/${category.slug}`}
-                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-red-600 hover:bg-gray-50"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {category.name}
-              </Link>
-            ))}
+        {/* Mobile Menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden py-4 border-t">
+            <nav className="flex flex-col space-y-4">
+              {categories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/category/${category.slug}`}
+                  className="text-gray-600 hover:text-red-600 transition-colors"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </nav>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </header>
   );
 } 
